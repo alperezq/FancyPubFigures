@@ -3,7 +3,13 @@ Fancy Publication Summary
 Alvaro L Perez-Quintero
 2/26/2021
 
-## R Markdown
+As seen on twitter
+(<https://twitter.com/alperezqui/status/1365042068435918855>), this is
+the R code and short tutorial to generate a figures ummarizing
+publication statistics from pubmed and google scholar, you’ll need to
+have a google scholar profile <https://scholar.google.com/>
+
+## 1\. Requirements
 
 This is an R Markdown document. Markdown is a simple formatting syntax
 for authoring HTML, PDF, and MS Word documents. For more details on
