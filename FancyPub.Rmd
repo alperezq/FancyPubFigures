@@ -61,7 +61,7 @@ library(dplyr)
 Scholar_ID <- "Sc3CfZsAAAAJ" 
 # this is your author scholar Id, it'll be found in the adress of your scholar profile after user=and before &, https://scholar.google.com/citations?user=Sc3CfZsAAAAJ&hl=en
 Author_fullname<- c("Alvaro L Perez-Quintero","Alvaro Perez-Quintero") #full name as it appears in articles in pubmed
-Author_lastname<-c("Perez-Quintero","Pérez-Quintero") #last name and alternative spellings
+Author_lastname<-c("Perez-Quintero","Pérez-Quintero","Perez‐Quintero") #last name and alternative spellings
 
 #Get publication record from scholar
 SC<-gcite(user=Scholar_ID,plot_wordcloud = FALSE)
@@ -180,6 +180,71 @@ p1v3<-ggplot(df,aes(y=total.citations,x=year))+
     )
 
 p1v3
+```
+
+Version 4. Highlight first and last author
+
+
+```{r Publication history v4 , include = TRUE, echo=TRUE,warning=FALSE,message=FALSE}
+
+#highlight last author paper
+lauthor<-sapply(str_split(df$authors,","), tail, 1)#get last author for each paper
+df$first_last<-ifelse(grepl(paste(Author_lastname,collapse = "|"),lauthor),2,df$first) #assign value 2 to last author papers, first author gets value 1
+
+df$either<-df$first_last #create colum to give bold stroke to either firt and last
+df$either[df$either>1]<-1
+#df$first_last[df$first_last==0]<-NA
+
+
+#Plot
+#lines with changes added to highlight last auhtor ar eindicated with (last author) # this is the version with Journal impact factor vs publication history
+p1v4<-ggplot(df,aes(y=ImpactFactor,x=year))+
+  geom_point(aes(fill=total.citations,stroke=either,shape=as.character(first_last)),size=4,na.rm = TRUE)+ #points filled according to impact factor, with border according to first author (last author)
+  geom_text_repel(aes(label=labels), xlim = c(max(df$year)+2, Inf), ylim = c(-Inf, Inf),min.segment.length = 0,na.rm = TRUE)+ #add labels starting 2 years after the xlimit
+  theme_cowplot()+
+  coord_cartesian(clip = "off") + #
+  coord_capped_cart(bottom='both')+
+  scale_fill_gradient2(low="grey70",mid="khaki3",high="deepskyblue3", guide=FALSE)+ #create color scale
+  scale_x_continuous(breaks=c(min(df$year),max(df$year)),limits = c(min(df$year),max(df$year)+15))+ #modify x axis to expand to the right, but only label years with dara
+  scale_shape_manual(values=c(21,21,23),breaks=c("1","2"),name=NULL,labels=c("First Author","Last Author"))+ #scale fo shapes for first and last author (last author)
+  coord_capped_cart(bottom='both')+ #limit the line on the x axis to the limits
+  continuous_scale("stroke", "stroke",  palette = function(x){scales::rescale(x, c(0, 1.5))}, breaks = c(1),name = NULL,guide=FALSE)+ # Modify scale for stroke size (last author)
+  ggtitle("Journal Impact Factor")+
+  #modify axes to clean up the plot
+  xlab("Year of publication")+
+  theme(
+    axis.title.x =element_text(angle=0,color="black",hjust = 0.05,size=11),axis.text.x = element_text(size=9,color="grey30"),
+    axis.line.y = element_blank(),panel.grid.major.y = element_line(color="grey",linetype = 3),axis.title.y.left = element_blank(), axis.text.y = element_text(size=9,color="grey30"),#y axis
+    plot.title = element_text(color="grey40",face = "bold",size=12), #tittle
+    legend.position = c(0.6,0), legend.text= element_text(size=9,color="grey30"),#legend
+    )+
+  guides(shape = guide_legend(override.aes = list(stroke=1.5)))#get same size for stroke in the legend (last author)
+
+#Plot
+#lines with changes added to highlight last auhtor ar eindicated with (last author) # this is the version with citations vs publication history
+p1v4<-ggplot(df,aes(y=total.citations,x=year))+
+  geom_point(aes(fill=total.citations,stroke=either,shape=as.character(first_last)),size=4,na.rm = TRUE)+ #points filled according to impact factor, with border according to first author (last author)
+  geom_text_repel(aes(label=labels), xlim = c(max(df$year)+2, Inf), ylim = c(-Inf, Inf),min.segment.length = 0,na.rm = TRUE)+ #add labels starting 2 years after the xlimit
+  theme_cowplot()+
+  coord_cartesian(clip = "off") + #
+  coord_capped_cart(bottom='both')+
+  scale_fill_gradient2(low="grey70",mid="khaki3",high="deepskyblue3", guide=FALSE)+ #create color scale for points
+  scale_shape_manual(values=c(21,21,23),breaks=c("1","2"),name=NULL,labels=c("First Author","Last Author"))+ #scale fo shapes for first and last author (last author)
+  scale_x_continuous(breaks=c(min(df$year),max(df$year)),limits = c(min(df$year),max(df$year)+15))+ #modify x axis to expand to the right, but only label years with dara
+  coord_capped_cart(bottom='both')+ #limit the line on the x axis to the limits
+  continuous_scale("stroke", "stroke",  palette = function(x){scales::rescale(x, c(0, 1.5))}, breaks = c(1),name = NULL,guide=FALSE)+ # Modify scale for stroke size (last author)
+  ggtitle("Citations per Article")+
+  #modify axes to clean up the plot
+  xlab("Year of publication")+
+  theme(
+    axis.title.x =element_text(angle=0,color="black",hjust = 0.05,size=11),axis.text.x = element_text(size=9,color="grey30"),
+    axis.line.y = element_blank(),panel.grid.major.y = element_line(color="grey",linetype = 3),axis.title.y.left = element_blank(), axis.text.y = element_text(size=9,color="grey30"),#y axis
+    plot.title = element_text(color="grey40",face = "bold",size=12), #tittle
+    legend.position = c(0.6,0), legend.text= element_text(size=9,color="grey30"),#legend
+    )+
+  guides(shape = guide_legend(override.aes = list(stroke=1.5)))#get same size for stroke in the legend (last author)
+
+p1v4
 ```
 
 ## 2. Coauthor affiliation Map
@@ -361,13 +426,13 @@ p4
 #use cowplot's plot grid to arrange plots as needed
 
 #all plots same size
-plot_grid(p1v1,p2,p3,p4,ncol=2,nrow=2)
+plot_grid(p1v2,p2,p3,p4,ncol=2,nrow=2)
 
 #or a more complex grid with a tittle
 
 panel1<-plot_grid(p3,p4,rel_widths = c(1,1.5),ncol=2)
 panel2<-plot_grid(p2,panel1,ncol=1, rel_heights = c(1.5,1))
-allpanels<-plot_grid(p1v1,panel2,ncol=2,rel_widths = c(1.5,2))
+allpanels<-plot_grid(p1v2,panel2,ncol=2,rel_widths = c(1.5,2))
 title <- ggdraw() + draw_label(paste("Publication summary\n",Author_fullname[1],sep=""),fontface = 'bold',x = 0,  hjust = 0 ,color="deepskyblue4") +
   theme(plot.margin = margin(0, 0, 0, 0))
 plot_grid( title, allpanels,  ncol = 1,
