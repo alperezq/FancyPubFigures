@@ -1,17 +1,21 @@
-Fancy Publication Summary
-================
-Alvaro L Perez-Quintero
-2/26/2021
+---
+title: "Fancy Publication Summary"
+author: "Alvaro L Perez-Quintero"
+date: "2/26/2021"
+output: github_document
+fig_width: 20
+fig_height: 8 
+---
 
-As seen on twitter
-(<https://twitter.com/alperezqui/status/1365042068435918855>), this is
-the R code and short tutorial to generate a figures ummarizing
-publication statistics from pubmed and google scholar, you’ll need to
-have a google scholar profile <https://scholar.google.com/>
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=10, fig.height=6) 
+```
+
+As seen on twitter (https://twitter.com/alperezqui/status/1365042068435918855), this is the R code and short tutorial to generate a figures ummarizing publication statistics from pubmed and google scholar, you'll need to have a google scholar profile https://scholar.google.com/
 
 ## Requirements
-
-``` r
+```{r Packages, include = TRUE,eval=FALSE}
 #For biblio analysis
 install.packages("gcite")
 install.packages("scholar")
@@ -34,14 +38,14 @@ install.packages("ggwordcloud")
 #Miscellaneous
 install.packages("stringr")
 install.packages("dplyr")
+
 ```
 
-## 1\. Publication History Plot
+## 1. Publication History Plot
 
-Version 1. Impact factor vs publication year, highlighting articles with
-text
+Version 1. Impact factor vs publication year, highlighting articles with text
+```{r Publication history v1 , include = TRUE, echo=TRUE,warning=FALSE,message=FALSE}
 
-``` r
 #load libraries
 library(gcite) #to get dataframe of publications
 library(scholar) #to get impach factors
@@ -112,11 +116,9 @@ p1v1<-ggplot(df,aes(y=ImpactFactor,x=year))+
 p1v1
 ```
 
-![](FancyPub_files/figure-gfm/Publication%20history%20v1%20-1.png)<!-- -->
-
 Version 2. Add images to highlight articles
+```{r Publication history v2 , include = TRUE, echo=TRUE,warning=FALSE,message=FALSE}
 
-``` r
 library(ggtext) #to allow to insert figures
 
 #Add images to specific entries in the dataframe, can be added from urls or local files
@@ -147,12 +149,13 @@ p1v2<-ggplot(df,aes(y=ImpactFactor,x=year))+
 p1v2
 ```
 
-![](FancyPub_files/figure-gfm/Publication%20history%20v2%20-1.png)<!-- -->
 
-Version 3. If you’d rather not have impact fator, an alternative is
-citations per paper
+Version 3. If you'd rather not have impact fator, an alternative is citations per paper 
 
-``` r
+
+```{r Publication history v3 , include = TRUE, echo=TRUE,warning=FALSE,message=FALSE}
+
+
 df$total.citations<-as.numeric(df$total.citations)
 
 #Plot
@@ -179,11 +182,9 @@ p1v3<-ggplot(df,aes(y=total.citations,x=year))+
 p1v3
 ```
 
-![](FancyPub_files/figure-gfm/Publication%20history%20v3%20-1.png)<!-- -->
+## 2. Coauthor affiliation Map
 
-## 2\. Coauthor affiliation Map
-
-``` r
+```{r Affiliation Map , include = TRUE, echo=TRUE,warning=FALSE,message=FALSE}
 library(easyPubMed)
 library(maps)
 library(rgeos)
@@ -251,13 +252,14 @@ p2<-ggplot() +
 
 
 p2
+
 ```
 
-![](FancyPub_files/figure-gfm/Affiliation%20Map%20-1.png)<!-- -->
 
-## 3\. Citation History
+## 3.  Citation History
 
-``` r
+```{r Citation history , include = TRUE, echo=TRUE,warning=FALSE,message=FALSE}
+
 #for this section we use the SC object obtainedby doing SC<-gcite(user=Scholar_ID,plot_wordcloud = FALSE) 
 
 hind<-SC$citation_indices[2,2]
@@ -278,11 +280,9 @@ p3<-ggplot(Cithist) +
 p3
 ```
 
-![](FancyPub_files/figure-gfm/Citation%20history%20-1.png)<!-- -->
+## 4.  Abstract world cloud
 
-## 4\. Abstract world cloud
-
-``` r
+```{r World cloud, include = TRUE, echo=TRUE,warning=FALSE,message=FALSE}
 library(tm)
 library(ggwordcloud)
 
@@ -350,22 +350,19 @@ p4<-ggplot(CL,  aes(label = word, size = freq, color = freq)) +
   theme(plot.title = element_text(color="grey40",face = "bold",size=12))
 
 p4
+
 ```
 
-![](FancyPub_files/figure-gfm/World%20cloud-1.png)<!-- -->
+## 4.  Getting it all together
 
-## 4\. Getting it all together
 
-``` r
+```{r Big plot, include = TRUE, echo=TRUE,warning=FALSE,message=FALSE}
+
 #use cowplot's plot grid to arrange plots as needed
 
 #all plots same size
 plot_grid(p1v1,p2,p3,p4,ncol=2,nrow=2)
-```
 
-![](FancyPub_files/figure-gfm/Big%20plot-1.png)<!-- -->
-
-``` r
 #or a more complex grid with a tittle
 
 panel1<-plot_grid(p3,p4,rel_widths = c(1,1.5),ncol=2)
@@ -377,6 +374,5 @@ plot_grid( title, allpanels,  ncol = 1,
   # rel_heights values control vertical title margins
   rel_heights = c(0.1, 1)
 )
-```
 
-![](FancyPub_files/figure-gfm/Big%20plot-2.png)<!-- -->
+```
