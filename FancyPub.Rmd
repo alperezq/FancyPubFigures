@@ -199,7 +199,7 @@ df$either[df$either>1]<-1
 #Plot
 #lines with changes added to highlight last auhtor ar eindicated with (last author) # this is the version with Journal impact factor vs publication history
 p1v4<-ggplot(df,aes(y=ImpactFactor,x=year))+
-  geom_point(aes(fill=total.citations,stroke=either,shape=as.character(first_last)),size=4,na.rm = TRUE)+ #points filled according to impact factor, with border according to first author (last author)
+  geom_point(aes(fill=ImpactFactor,stroke=either,shape=as.character(first_last)),size=4,na.rm = TRUE)+ #points filled according to impact factor, with border according to first author (last author)
   geom_text_repel(aes(label=labels), xlim = c(max(df$year)+2, Inf), ylim = c(-Inf, Inf),min.segment.length = 0,na.rm = TRUE)+ #add labels starting 2 years after the xlimit
   theme_cowplot()+
   coord_cartesian(clip = "off") + #
