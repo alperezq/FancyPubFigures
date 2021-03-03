@@ -77,6 +77,9 @@ df$year<-as.numeric(str_split_fixed(df$publication.date,"/",2)[,1])#get only yea
 IF<-get_impactfactor(df$journal) #get impact factor for journals, some might not be accurate and may require to be changed manually
 df<-cbind(df,IF)#add impact factors to data frame
 
+#IMPORTANT#
+#the get_impactfactor fucntion is prone to error, so verify and correct, some journal names are not found or get replaced by others
+
 #highlight first author paper
 fchar<-str_split_fixed(df$authors,",",2)[,1]#split author list by comma
 df$first<-ifelse(grepl(paste(Author_lastname,collapse = "|"),fchar),1,0)#find matches to your name, I have to use alternative spellings with and without accent
