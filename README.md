@@ -63,7 +63,7 @@ colnames(df)<-c("title","authors","journal","number","total.citations","publicat
 
 ################## ALTERNATIVE ###########
 #if for some reason getting publications with scholar is not working use these commands for gcite
-#install.packages("scholar")
+#install.packages("gcite")
 #library(gcite)
 #SC<-gcite(user=Scholar_ID,plot_wordcloud = FALSE)
 #df<-SC$paper_df
