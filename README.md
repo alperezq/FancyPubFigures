@@ -13,7 +13,7 @@ have a google scholar profile <https://scholar.google.com/>
 
 ``` r
 #For biblio analysis
-install.packages("gcite")
+install.packages("scholar")
 install.packages("easyPubMed")
 install.packages("tm")
 
