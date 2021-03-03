@@ -18,7 +18,6 @@ As seen on twitter (https://twitter.com/alperezqui/status/1365042068435918855), 
 ```{r Packages, include = TRUE,eval=FALSE}
 #For biblio analysis
 install.packages("gcite")
-install.packages("scholar")
 install.packages("easyPubMed")
 install.packages("tm")
 
@@ -47,8 +46,7 @@ Version 1. Impact factor vs publication year, highlighting articles with text
 ```{r Publication history v1 , include = TRUE, echo=TRUE,warning=FALSE,message=FALSE}
 
 #load libraries
-library(gcite) #to get dataframe of publications
-library(scholar) #to get impach factors
+library(scholar) #to get publications and impact factors
 library(stringr) #to modify text
 #for plotting
 library(cowplot) 
@@ -64,17 +62,20 @@ Author_fullname<- c("Alvaro L Perez-Quintero","Alvaro Perez-Quintero") #full nam
 Author_lastname<-c("Perez-Quintero","Pérez-Quintero","Perez‐Quintero") #last name and alternative spellings
 
 #Get publication record from scholar
-SC<-gcite(user=Scholar_ID,plot_wordcloud = FALSE)
-df<-SC$paper_df
-#I reccomend saving this data frame and reading it back, since the gcite function wil throw errors after using it multiple times
-write.csv(df,"Scholar_citations.csv")
-df<-read.csv("Scholar_citations.csv")
+df<-get_publications(Scholar_ID)
+colnames(df)<-c("title","authors","journal","number","total.citations","publication.date","cid","pubid")
 
+################## ALTERNATIVE ###########
+#if for some reason getting publications with scholar is not working use these commands for gcite
+#install.packages("scholar")
+#library(gcite)
+#SC<-gcite(user=Scholar_ID,plot_wordcloud = FALSE)
+#df<-SC$paper_df
+##########################################
 
 df<-df[!is.na(df$journal),] #filter out entries with unknown journal
 df<-df[!is.na(df$publication.date),] #flter out entries with unknown date
 df$year<-as.numeric(str_split_fixed(df$publication.date,"/",2)[,1])#get only year of publication  
-
 
 #get impact factor
 IF<-get_impactfactor(df$journal) #get impact factor for journals, some might not be accurate and may require to be changed manually
@@ -92,7 +93,7 @@ Highlight<-c("Nature biotechnology") #Create a vector For those articles you'd l
 df$labels<-ifelse(df$journal %in% Highlight, as.character(df$journal), NA)
 
 #Optional: limit to publications after a given year, I have only tested the code using ~10years
-df<-df[df$year>2009,]
+df<-df[df$year>=2009,]
 #Plot
 p1v1<-ggplot(df,aes(y=ImpactFactor,x=year))+
   geom_point(aes(fill=ImpactFactor,stroke=first),size=4,shape=21,na.rm = TRUE)+ #points filled according to impact factor, with border according to first authos
@@ -325,12 +326,18 @@ p2
 
 ```{r Citation history , include = TRUE, echo=TRUE,warning=FALSE,message=FALSE}
 
-#for this section we use the SC object obtainedby doing SC<-gcite(user=Scholar_ID,plot_wordcloud = FALSE) 
-
-hind<-SC$citation_indices[2,2]
-Cithist<-SC$overall_citations
-
+#Get citation history
+Cithist<-get_citation_history(Scholar_ID)
+colnames(Cithist)<-c("year","n_citations")
 Cithist<-Cithist[Cithist$year>2009,]
+
+#ALTERNATIVE, if using "gcite":
+#Cithist<-SC$overall_citations
+
+#Calculate h-index using the df object from step 1
+citvec<-df$total.citations[order(df$total.citations,decreasing = TRUE)]#vector of ordered citation totals
+hind<-tail(which(citvec >= seq_along(citvec)), 1)
+
 p3<-ggplot(Cithist) +
   geom_bar(aes(x=year,y=n_citations,fill=n_citations),stat="identity",position = "dodge",width = 0.95)+ #bar plot with citations
   geom_text(aes(x=year,y=n_citations+10,label=n_citations),size=3,nudge_y = 10)+ #add citation numbers above bars, might need to modify according to scale
