@@ -5,7 +5,7 @@ Alvaro L Perez-Quintero
 
 As seen on twitter
 (<https://twitter.com/alperezqui/status/1365042068435918855>), this is
-the R code and short tutorial to generate a figures ummarizing
+the R code and short tutorial to generate a figures summarizing
 publication statistics from pubmed and google scholar, you’ll need to
 have a google scholar profile <https://scholar.google.com/>
 
@@ -198,7 +198,7 @@ df$either[df$either>1]<-1
 
 
 #Plot
-#lines with changes added to highlight last auhtor ar eindicated with (last author) # this is the version with Journal impact factor vs publication history
+#lines with changes added to highlight last auhtor are indicated with (last author) # this is the version with Journal impact factor vs publication history
 p1v4<-ggplot(df,aes(y=ImpactFactor,x=year))+
   geom_point(aes(fill=ImpactFactor,stroke=either,shape=as.character(first_last)),size=4,na.rm = TRUE)+ #points filled according to impact factor, with border according to first author (last author)
   geom_text_repel(aes(label=labels), xlim = c(max(df$year)+2, Inf), ylim = c(-Inf, Inf),min.segment.length = 0,na.rm = TRUE)+ #add labels starting 2 years after the xlimit
@@ -222,7 +222,7 @@ p1v4<-ggplot(df,aes(y=ImpactFactor,x=year))+
   guides(shape = guide_legend(override.aes = list(stroke=1.5)))#get same size for stroke in the legend (last author)
 
 #Plot
-#lines with changes added to highlight last auhtor ar eindicated with (last author) # this is the version with citations vs publication history
+#lines with changes added to highlight last author are indicated with (last author) # this is the version with citations vs publication history
 p1v4<-ggplot(df,aes(y=total.citations,x=year))+
   geom_point(aes(fill=total.citations,stroke=either,shape=as.character(first_last)),size=4,na.rm = TRUE)+ #points filled according to impact factor, with border according to first author (last author)
   geom_text_repel(aes(label=labels), xlim = c(max(df$year)+2, Inf), ylim = c(-Inf, Inf),min.segment.length = 0,na.rm = TRUE)+ #add labels starting 2 years after the xlimit
@@ -261,7 +261,7 @@ library(rworldmap)
 #Get detailed author and abstract information for each article from pubmed
 my_query <- paste(Author_fullname,"[AU]",sep="",collapse = " OR ")
 my_entrez_id <- get_pubmed_ids(my_query)
-my_abstracts_xml <- fetch_pubmed_data(pubmed_id_list = my_entrez_id) # get data in xml fromar
+my_abstracts_xml <- fetch_pubmed_data(pubmed_id_list = my_entrez_id) # get data in xml format
 
 #transfrom pubmed data to data frame
 my_PM_list <- articles_to_list(pubmed_data = my_abstracts_xml)
@@ -293,7 +293,7 @@ countries$region <- gsub("USA","United States of America",countries$region)
 countries$region <- gsub("UK","United Kingdom",countries$region)
 
 #We need to get coordinates for each country to add to a map
-#I decided to use geographical centroids as calculated from lat and longitude data
+#I decided to use geographical centroids as calculated from latitude and longitude data
 
 wmap <- getMap(resolution="high")
 centroids <- gCentroid(wmap, byid=TRUE)
@@ -396,7 +396,7 @@ m <- as.matrix(dtm)
 v <- sort(rowSums(m),decreasing=TRUE)
 d <- data.frame(word = names(v),freq=v)
 
-#Here I reccommend checking the object d, there will be words that are redundant (synonims or abbreviations) that one might want to consolidate into one word, for this, create as many vectors with the synonims to collapse as needed, the first word listed will be the one used for the world cloud
+#Here I recommend checking the object d, there will be words that are redundant (synonyms or abbreviations) that one might want to consolidate into one word, for this, create as many vectors with the synonyms to collapse as needed, the first word listed will be the one used for the world cloud
 
 s1<-c("micrornas","mirna","mirnas*","mirnas")
 s2<-c("genes","genes")
